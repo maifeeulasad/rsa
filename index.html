@@ -1,0 +1,195 @@
+<h1>RSA Caluculator</h1>
+
+<h2>17701086 - Maifee Ul Asad</h2>
+
+<h3>Stage 1 - Generate Key</h3>
+Input two prime number for p and q.
+</br>
+
+Prime in between 17 and 100: (As we will cover ascii characters only)
+</br>
+11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97
+</br>
+
+<div>
+<label for="p">p:</label>
+<input type="number" step="1" id="p" name="p" min="10" max="100">
+</div>
+
+<div>
+<label for="q">q:</label>
+<input type="number" step="1" id="q" name="q" min="10" max="100">
+</div>
+
+<button onclick="generate()">Key Generate</button>
+
+<div>
+<label for="n">n:</label>
+<input type="number" id="n" name="n" readonly="true">
+</div>
+
+<div>
+<label for="phi">phi(n):</label>
+<input type="number" id="phi" name="phi" readonly="true">
+</div>
+
+<div>
+<label for="e">e:</label>
+<input type="number" id="e" name="e" readonly="true">
+</div>
+
+<div>
+<label for="d">d:</label>
+<input type="number" id="d" name="d" readonly="true">
+</div>
+
+<div>
+<label for="pub">Public Key Pair:</label>
+<input id="pub" name="pub" readonly="true">
+</div>
+
+<div>
+<label for="pri">Private Key Pair:</label>
+<input id="pri" name="pri" readonly="true">
+</div>
+
+<hr>
+
+<h3>Stage 2 - Encrytion Test</h3>
+
+<div>
+<label for="ins">Input(ASCII lowercase character only):</label>
+<input id="ins" name="ins">
+</div>
+
+<button onclick="enc()">Encrypt</button>
+
+<div>
+<label for="en">Encrypted:</label>
+<input id="en" name="en" readonly="true">
+</div>
+
+<hr>
+
+<h3>Stage 3 - Decryption Test</h3>
+
+<div>
+<label for="ind">Input(To Decrypt):</label>
+<input id="ind" name="ind">
+</div>
+
+<button onclick="dec()">Decrypt</button>
+
+<div>
+<label for="de">Decrypted:</label>
+<input id="de" name="de" readonly="true">
+</div>
+
+
+<p>&copy; 2020 Maifee Ul Asad, a copy of License is available 
+	<a href="https://github.com/maifeeulasad/rsa/blob/master/LICENSE">here</a>
+<p>
+
+<script>
+function enc(){
+	let ins=document.getElementById("ins").value;
+	let res="";
+	let n=document.getElementById("n").value;
+	let e=document.getElementById("e").value;
+	for(var i=0;i<ins.length;i++){
+		let c=ex_mod(ins[i].charCodeAt(0)-'a'.charCodeAt(0),e,n);
+		console.debug(c);
+		let ch=String.fromCharCode(c+'a'.charCodeAt(0));
+		res=res+ch;
+	}
+	document.getElementById("en").value=res;
+}
+</script>
+
+<script>
+function dec(){
+	let ind=document.getElementById("ind").value;
+	let res="";
+	let n=document.getElementById("n").value;
+	let d=document.getElementById("d").value;
+	for(var i=0;i<ind.length;i++){
+		let c=ex_mod(ind[i].charCodeAt(0)-'a'.charCodeAt(0),d,n);
+		console.debug(c);
+		let ch=String.fromCharCode(c+'a'.charCodeAt(0));
+		res=res+ch;
+	}
+	document.getElementById("de").value=res;
+}
+</script>
+
+
+<script>
+function ex_mod(x,y,p){
+    let res = 1;
+    x = x % p; 
+    if (x == 0) 
+    	return 0; 
+    while (y > 0){    
+        if (y & 1)  
+            res = (res*x) % p;  
+        y = y>>1;
+        x = (x*x) % p;  
+    }  
+    return res; 
+}
+</script>
+
+
+<script>
+function generate(){
+	let p=document.getElementById("p").value;
+	let q=document.getElementById("q").value;
+	let n=p*q;
+	document.getElementById("n").value=n;
+	document.getElementById("phi").value=(p-1)*(q-1);
+	let e=get_coprime();
+	document.getElementById("e").value=e;
+	let d=select_d();
+	document.getElementById("d").value=d;
+	document.getElementById("pub").value="{"+e+","+n+"}";
+	document.getElementById("pri").value="{"+d+","+n+"}";
+}
+</script>
+
+<script>
+function gcd(a,b) {
+    if (b > a) {var temp = a; a = b; b = temp;}
+    while (true) {
+        if (b == 0) return a;
+        a %= b;
+        if (a == 0) return b;
+        b %= a;
+    }
+}
+</script>
+<script>
+function coprime(a,b) {
+	return (gcd(a,b)===1);
+}
+</script>
+<script>
+function get_coprime() {
+	let phi=document.getElementById("phi").value;
+	for(var i=2;i<phi;i+=1){
+		if(coprime(i,phi)==1){
+			return i;
+		}
+	}
+}
+</script>
+<script>
+function select_d() {
+	let e=document.getElementById("e").value;
+	let phi=document.getElementById("phi").value;
+	for(var d=1;d<=phi;d++){
+		if((d*e)%phi==1)
+			return d;
+	}
+	return -1;
+}
+</script>
